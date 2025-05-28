@@ -16,6 +16,7 @@ export const SnackbarProvider = ({ children }) => {
   const [message, setMessage] = useState("");
   const [severity, setSeverity] = useState("info");
   const [formSubmission, setFormSubmission] = useState(null);
+  const [isChanged, setIsChanged] = useState(false);
 
   const showMessage = (msg, sev = "info", submission = null) => {
     setMessage(msg);
@@ -37,7 +38,10 @@ export const SnackbarProvider = ({ children }) => {
         data: { ...formSubmission.data, liked: true },
       };
       await saveLikedFormSubmission(updated);
-      console.log("Saved to localStorage!");
+      setIsChanged(true);
+      setTimeout(() => {
+        setIsChanged(false);
+      }, 1000);
     } catch (err) {
       console.error("Save failed", err);
     } finally {
@@ -46,7 +50,7 @@ export const SnackbarProvider = ({ children }) => {
   };
 
   return (
-    <SnackbarContext.Provider value={{ showMessage }}>
+    <SnackbarContext.Provider value={{ showMessage, isChanged }}>
       {children}
       <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
         <Alert

@@ -5,21 +5,22 @@ import { useSnackbar } from "./components/Context/SnackbarContext";
 import { fetchLikedFormSubmissions, onMessage } from "./service/mockServer";
 
 export default function Content() {
-  const { showMessage } = useSnackbar();
+  const { showMessage, isChanged } = useSnackbar();
 
   const [likedList, setLikedList] = useState([]);
 
+  const loadLiked = async () => {
+    try {
+      const submissions = await fetchLikedFormSubmissions();
+      setLikedList(submissions.formSubmissions);
+    } catch (e) {
+      console.error("Failed to fetch liked submissions", e);
+    }
+  };
+
   useEffect(() => {
-    const loadLiked = async () => {
-      try {
-        const submissions = await fetchLikedFormSubmissions();
-        setLikedList(submissions.formSubmissions);
-      } catch (e) {
-        console.error("Failed to fetch liked submissions", e);
-      }
-    };
     loadLiked();
-  }, []);
+  }, [isChanged]);
 
   useEffect(() => {
     onMessage((formSubmission) => {

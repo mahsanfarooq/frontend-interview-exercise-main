@@ -12,7 +12,6 @@ import { createMockFormSubmission } from "./service/mockServer";
 import { useSnackbar } from "./components/Context/SnackbarContext";
 
 export default function Header() {
-  const { showMessage } = useSnackbar();
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -33,7 +32,6 @@ export default function Header() {
             size="small"
             color="secondary"
             onClick={() => {
-              showMessage("Action was successful!", "success");
               createMockFormSubmission();
             }}
           >
