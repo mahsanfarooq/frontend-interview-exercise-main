@@ -1,13 +1,13 @@
 import React, { createContext, useContext, useState } from "react";
-import { Snackbar, Alert } from "@mui/material";
+import { Snackbar, Alert, Button } from "@mui/material";
+import { saveLikedFormSubmission } from "../../service/mockServer";
 
 const SnackbarContext = createContext();
 
 export const useSnackbar = () => {
   const context = useContext(SnackbarContext);
-  if (!context) {
+  if (!context)
     throw new Error("useSnackbar must be used within a SnackbarProvider");
-  }
   return context;
 };
 
@@ -15,32 +15,53 @@ export const SnackbarProvider = ({ children }) => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [severity, setSeverity] = useState("info");
+  const [formSubmission, setFormSubmission] = useState(null);
 
-  const showMessage = (msg, sev = "info") => {
+  const showMessage = (msg, sev = "info", submission = null) => {
     setMessage(msg);
     setSeverity(sev);
+    setFormSubmission(submission);
     setOpen(true);
   };
 
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") return;
+  const handleClose = () => {
     setOpen(false);
+    setFormSubmission(null);
+  };
+
+  const handleLike = async () => {
+    if (!formSubmission) return;
+    try {
+      const updated = {
+        ...formSubmission,
+        data: { ...formSubmission.data, liked: true },
+      };
+      await saveLikedFormSubmission(updated);
+      console.log("Saved to localStorage!");
+    } catch (err) {
+      console.error("Save failed", err);
+    } finally {
+      handleClose();
+    }
   };
 
   return (
     <SnackbarContext.Provider value={{ showMessage }}>
       {children}
-      <Snackbar
-        open={open}
-        autoHideDuration={3000}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
+      <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
         <Alert
-          onClose={handleClose}
           severity={severity}
-          variant="filled"
-          sx={{ width: "100%" }}
+          onClose={handleClose}
+          action={
+            <>
+              <Button color="inherit" size="small" onClick={handleLike}>
+                Like
+              </Button>
+              <Button color="inherit" size="small" onClick={handleClose}>
+                Dismiss
+              </Button>
+            </>
+          }
         >
           {message}
         </Alert>

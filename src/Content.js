@@ -1,15 +1,47 @@
-import React from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import React, { useEffect, useState } from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { useSnackbar } from "./components/Context/SnackbarContext";
+import { fetchLikedFormSubmissions, onMessage } from "./service/mockServer";
 
 export default function Content() {
+  const { showMessage } = useSnackbar();
+
+  const [likedList, setLikedList] = useState([]);
+
+  useEffect(() => {
+    const loadLiked = async () => {
+      try {
+        const submissions = await fetchLikedFormSubmissions();
+        setLikedList(submissions.formSubmissions);
+      } catch (e) {
+        console.error("Failed to fetch liked submissions", e);
+      }
+    };
+    loadLiked();
+  }, []);
+
+  useEffect(() => {
+    onMessage((formSubmission) => {
+      showMessage(
+        `${formSubmission.data.firstName} just signed up!`,
+        "info",
+        formSubmission
+      );
+    });
+  }, []);
+
+  console.log("likedList", likedList);
   return (
-    <Box sx={{marginTop: 3}}>
+    <Box sx={{ marginTop: 3 }}>
       <Typography variant="h4">Liked Form Submissions</Typography>
 
-      <Typography variant="body1" sx={{fontStyle: 'italic', marginTop: 1}}>
-        TODO: List of liked submissions here (delete this line)
-      </Typography>
+      {likedList?.map((submission) => (
+        <div key={submission.id}>
+          {submission.data.firstName} {submission.data.lastName} -{" "}
+          {submission.data.email}
+        </div>
+      ))}
     </Box>
   );
 }
