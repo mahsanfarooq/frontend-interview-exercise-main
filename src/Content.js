@@ -50,7 +50,6 @@ export default function Content() {
       </Typography>
  
       {loader || likedLoader ? (
-        // Skeleton loaders while fetching
         Array.from({ length: 3 }).map((_, i) => (
           <Skeleton
             key={i}
