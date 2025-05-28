@@ -1,4 +1,4 @@
-// components/withLoadingAndError.jsx
+
 import React from "react";
 import { Box, Skeleton, Alert, AlertTitle, Button, Typography } from "@mui/material";
 
