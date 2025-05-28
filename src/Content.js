@@ -50,7 +50,7 @@ export default function Content() {
       </Typography>
  
       {loader || likedLoader ? (
-        Array.from({ length: 3 }).map((_, i) => (
+        Array.from({ length: 3 }).map((item, i) => (
           <Skeleton
             key={i}
             variant="rectangular"
@@ -59,10 +59,10 @@ export default function Content() {
             sx={{ borderRadius: 2, mb: 2 }}
           />
         ))
-      ) : likedList.length === 0 ? (
+      ) : likedList?.length === 0 ? (
         <Typography color="text.secondary">No liked submissions.</Typography>
       ) : (
-        likedList.map((submission) => {
+        likedList?.map((submission) => {
           const { firstName, lastName, email } = submission.data;
           const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
  
