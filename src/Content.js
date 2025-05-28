@@ -15,7 +15,7 @@ export default function Content() {
   const [loader, setLoader] = useState(false);
   const [loadError, setLoadError] = useState(null);
 
-  const loadLiked = async () => {
+  const loadLikedList = async () => {
     setLoader(true);
     setLoadError(null);
     try {
@@ -30,7 +30,7 @@ export default function Content() {
   };
 
   useEffect(() => {
-    loadLiked();
+    loadLikedList();
   }, [likedLoader]);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function Content() {
       <EnhancedLikedList
         isLoading={loader || likedLoader}
         error={loadError}
-        onRetry={loadLiked}
+        onRetry={loadLikedList}
         data={likedList}
       />
     </Box>
