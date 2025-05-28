@@ -3,11 +3,13 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useSnackbar } from "./components/Context/SnackbarContext";
 import { fetchLikedFormSubmissions, onMessage } from "./service/mockServer";
+import { CircularProgressComponent } from "./components/CircularProgress";
 
 export default function Content() {
-  const { showMessage, isChanged } = useSnackbar();
+  const { showMessage, likedLoader } = useSnackbar();
 
   const [likedList, setLikedList] = useState([]);
+  const [loader, setLoader] = useState(false);
 
   const loadLiked = async () => {
     try {
@@ -15,12 +17,15 @@ export default function Content() {
       setLikedList(submissions.formSubmissions);
     } catch (e) {
       console.error("Failed to fetch liked submissions", e);
+    } finally {
+      setLoader(false);
     }
   };
 
   useEffect(() => {
+    setLoader(true);
     loadLiked();
-  }, [isChanged]);
+  }, [likedLoader]);
 
   useEffect(() => {
     onMessage((formSubmission) => {
@@ -32,7 +37,6 @@ export default function Content() {
     });
   }, []);
 
-  console.log("likedList", likedList);
   return (
     <Box sx={{ marginTop: 3 }}>
       <Typography variant="h4">Liked Form Submissions</Typography>
@@ -43,6 +47,7 @@ export default function Content() {
           {submission.data.email}
         </div>
       ))}
+      {(loader || likedLoader) && <CircularProgressComponent size={20} />}
     </Box>
   );
 }

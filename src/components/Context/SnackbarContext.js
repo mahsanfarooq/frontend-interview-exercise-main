@@ -16,7 +16,7 @@ export const SnackbarProvider = ({ children }) => {
   const [message, setMessage] = useState("");
   const [severity, setSeverity] = useState("info");
   const [formSubmission, setFormSubmission] = useState(null);
-  const [isChanged, setIsChanged] = useState(false);
+  const [likedLoader, setLikedLoader] = useState(false);
 
   const showMessage = (msg, sev = "info", submission = null) => {
     setMessage(msg);
@@ -32,25 +32,23 @@ export const SnackbarProvider = ({ children }) => {
 
   const handleLike = async () => {
     if (!formSubmission) return;
+    setLikedLoader(true);
     try {
       const updated = {
         ...formSubmission,
         data: { ...formSubmission.data, liked: true },
       };
       await saveLikedFormSubmission(updated);
-      setIsChanged(true);
-      setTimeout(() => {
-        setIsChanged(false);
-      }, 1000);
     } catch (err) {
       console.error("Save failed", err);
     } finally {
       handleClose();
+      setLikedLoader(false);
     }
   };
 
   return (
-    <SnackbarContext.Provider value={{ showMessage, isChanged }}>
+    <SnackbarContext.Provider value={{ showMessage, likedLoader }}>
       {children}
       <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
         <Alert
