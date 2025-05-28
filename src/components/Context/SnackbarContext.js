@@ -31,7 +31,6 @@ export const SnackbarProvider = ({ children }) => {
     setOpen(false);
     setFormSubmission(null);
   };
-
   const handleLike = async () => {
     if (!formSubmission) return;
     try {
@@ -45,8 +44,11 @@ export const SnackbarProvider = ({ children }) => {
     } catch (err) {
       console.error("Save failed", err);
       setLikedLoader(false);
+      if (open) setOpen(false);
+      setTimeout(() => {
+        showMessage("Failed to save Like.", "error");
+      }, 100);
     } finally {
-      handleClose();
       setLikedLoader(false);
     }
   };
@@ -59,18 +61,21 @@ export const SnackbarProvider = ({ children }) => {
           severity={severity}
           onClose={handleClose}
           action={
-            <>
-              <Button color="inherit" size="small" onClick={handleLike}>
-                Like
-              </Button>
-              <Button color="inherit" size="small" onClick={handleClose}>
-                Dismiss
-              </Button>
-            </>
+            severity === "error" ? null : (
+              <>
+                <Button color="inherit" size="small" onClick={handleLike}>
+                  Like
+                </Button>
+                <Button color="inherit" size="small" onClick={handleClose}>
+                  Dismiss
+                </Button>
+              </>
+            )
           }
         >
           {message}
         </Alert>
+
       </Snackbar>
     </SnackbarContext.Provider>
   );
