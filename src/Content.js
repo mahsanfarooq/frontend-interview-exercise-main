@@ -9,7 +9,7 @@ import { LikedSubmissionsList } from "./components/Lists/LikedSubmissionsList";
 const EnhancedLikedList = withLoadingAndError(LikedSubmissionsList);
 
 export default function Content() {
-  const { showMessage, likedLoader } = useSnackbar();
+  const { showMessage, likedLoader, likedVersion } = useSnackbar();
 
   const [likedList, setLikedList] = useState([]);
   const [loader, setLoader] = useState(false);
@@ -31,7 +31,7 @@ export default function Content() {
 
   useEffect(() => {
     loadLikedList();
-  }, [likedLoader]);
+  }, [likedVersion]);
 
   useEffect(() => {
     onMessage((formSubmission) => {
