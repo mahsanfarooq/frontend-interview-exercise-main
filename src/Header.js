@@ -1,4 +1,3 @@
-import React from "react";
 
 import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
@@ -9,7 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import { createMockFormSubmission } from "./service/mockServer";
-import { useSnackbar } from "./components/Context/SnackbarContext";
+
 
 export default function Header() {
   return (
