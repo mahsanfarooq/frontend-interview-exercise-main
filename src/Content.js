@@ -1,32 +1,38 @@
 import React, { useEffect, useState } from "react";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+import {
+  Box,
+  Typography,
+  Avatar,
+  Skeleton,
+  Fade,
+  Paper,
+  Stack,
+} from "@mui/material";
 import { useSnackbar } from "./components/Context/SnackbarContext";
 import { fetchLikedFormSubmissions, onMessage } from "./service/mockServer";
-import { CircularProgressComponent } from "./components/CircularProgress";
-
+ 
 export default function Content() {
   const { showMessage, likedLoader } = useSnackbar();
-
+ 
   const [likedList, setLikedList] = useState([]);
   const [loader, setLoader] = useState(false);
-
+ 
   const loadLiked = async () => {
     try {
       const submissions = await fetchLikedFormSubmissions();
-      setLikedList(submissions.formSubmissions);
+      setLikedList(submissions.formSubmissions || []);
     } catch (e) {
       console.error("Failed to fetch liked submissions", e);
     } finally {
       setLoader(false);
     }
   };
-
+ 
   useEffect(() => {
     setLoader(true);
     loadLiked();
   }, [likedLoader]);
-
+ 
   useEffect(() => {
     onMessage((formSubmission) => {
       showMessage(
@@ -36,18 +42,67 @@ export default function Content() {
       );
     });
   }, []);
-
+ 
   return (
-    <Box sx={{ marginTop: 3 }}>
-      <Typography variant="h4">Liked Form Submissions</Typography>
-
-      {likedList?.map((submission) => (
-        <div key={submission.id}>
-          {submission.data.firstName} {submission.data.lastName} -{" "}
-          {submission.data.email}
-        </div>
-      ))}
-      {(loader || likedLoader) && <CircularProgressComponent size={20} />}
+    <Box sx={{ mt: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Liked Form Submissions
+      </Typography>
+ 
+      {loader || likedLoader ? (
+        // Skeleton loaders while fetching
+        Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton
+            key={i}
+            variant="rectangular"
+            animation="wave"
+            height={72}
+            sx={{ borderRadius: 2, mb: 2 }}
+          />
+        ))
+      ) : likedList.length === 0 ? (
+        <Typography color="text.secondary">No liked submissions.</Typography>
+      ) : (
+        likedList.map((submission) => {
+          const { firstName, lastName, email } = submission.data;
+          const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
+ 
+          return (
+            <Fade in timeout={500} key={submission.id}>
+              <Paper
+                elevation={3}
+                sx={{
+                  display: "flex",
+                  cursor: "pointer",
+                  alignItems: "center",
+                  gap: 2,
+                  p: 2,
+                  mb: 2,
+                  borderRadius: 2,
+                  transition: "all 0.3s ease",
+                  backgroundColor: "background.paper",
+                  "&:hover": {
+                    backgroundColor: "#f5f5f5",
+                    transform: "scale(1.02)",
+                    boxShadow: 6,
+                  },
+                }}
+              >
+                <Avatar>{initials}</Avatar>
+                <Stack>
+                  <Typography fontWeight="bold">
+                    {firstName} {lastName}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {email}
+                  </Typography>
+                </Stack>
+              </Paper>
+            </Fade>
+          );
+        })
+      )}
     </Box>
   );
 }
+ 
