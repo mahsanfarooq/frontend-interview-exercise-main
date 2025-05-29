@@ -39,7 +39,6 @@ export const SnackbarProvider = ({ children }) => {
   };
 
   const handleLike = async () => {
-    console.log('formSubmission',formSubmission)
     if (!formSubmission) return;
     try {
       setLikedLoader(true);
