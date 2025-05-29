@@ -22,12 +22,14 @@ export const SnackbarProvider = ({ children }) => {
   const [formSubmission, setFormSubmission] = useState(null);
   const [likedLoader, setLikedLoader] = useState(false);
   const [likedVersion, setLikedVersion] = useState(0);
+  const [type, setType] = useState('fetch');
 
-  const showMessage = (msg, sev = "info", submission = null) => {
+  const showMessage = (msg, sev = "info", submission = null, type = 'fetch') => {
     setMessage(msg);
     setSeverity(sev);
     setFormSubmission(submission);
     setOpen(true);
+    setType(type);
   };
 
   const handleClose = (_, reason) => {
@@ -37,6 +39,7 @@ export const SnackbarProvider = ({ children }) => {
   };
 
   const handleLike = async () => {
+    console.log('formSubmission',formSubmission)
     if (!formSubmission) return;
     try {
       setLikedLoader(true);
@@ -46,18 +49,29 @@ export const SnackbarProvider = ({ children }) => {
       };
       await saveLikedFormSubmission(updated);
       setLikedVersion((prev) => prev + 1);
+      setLikedLoader(false);
       showMessage("New Like Saved!", "success");
     } catch (err) {
-      console.error("Save failed", err);
       setLikedLoader(false);
+      setFormSubmission(formSubmission)
       if (open) setOpen(false);
       setTimeout(() => {
-        showMessage("Failed to save Like.", "error");
+        showMessage("Failed to save Like.", "error", null, 'save');
       }, 100);
-    } finally {
-      setLikedLoader(false);
+      setTimeout(() => {
+        handleLike()
+      }, 3000);
     }
   };
+  const handleRetry = () => {
+    if (type === 'save') {
+      handleLike();
+    } else {
+      setLikedVersion((prev) => prev + 1);
+    }
+
+    if (open) setOpen(false);
+  }
 
   return (
     <SnackbarContext.Provider value={{ showMessage, likedLoader, likedVersion }}>
@@ -89,29 +103,42 @@ export const SnackbarProvider = ({ children }) => {
             info: <span style={{ fontSize: 22 }}>ℹ️</span>,
           }}
           action={
-            severity === "error" ? null : (
-              <>
-                {severity !== "success" && (
-                  <Button
-                    color="inherit"
-                    size="small"
-                    onClick={handleLike}
-                    disabled={likedLoader}
-                    sx={{ fontWeight: "bold" }}
-                  >
-                    {likedLoader ? "Saving..." : "Like"}
-                  </Button>
-                )}
+            <>
+              {severity === "error" ? (
                 <Button
                   color="inherit"
                   size="small"
-                  onClick={handleClose}
+                  onClick={() => {
+                    handleRetry();
+                  }}
                   sx={{ fontWeight: "bold" }}
                 >
-                  Dismiss
+                  Refresh
                 </Button>
-              </>
-            )
+              ) : (
+                <>
+                  {severity !== "success" && (
+                    <Button
+                      color="inherit"
+                      size="small"
+                      onClick={handleLike}
+                      disabled={likedLoader}
+                      sx={{ fontWeight: "bold" }}
+                    >
+                      {likedLoader ? "Saving..." : "Like"}
+                    </Button>
+                  )}
+                  <Button
+                    color="inherit"
+                    size="small"
+                    onClick={handleClose}
+                    sx={{ fontWeight: "bold" }}
+                  >
+                    Dismiss
+                  </Button>
+                </>
+              )}
+            </>
           }
 
           sx={{

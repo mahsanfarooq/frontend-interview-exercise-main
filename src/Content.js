@@ -21,11 +21,14 @@ export default function Content() {
     try {
       const submissions = await fetchLikedFormSubmissions();
       setLikedList(submissions.formSubmissions || []);
-    } catch (e) {
-      console.error("Failed to fetch liked submissions", e);
-      setLoadError("Failed to load liked submissions. Please try again.");
-    } finally {
       setLoader(false);
+    } catch (e) {
+      setLoadError("Failed to load liked submissions. Please try again.");
+      showMessage("Failed to load liked submissions.", "error");
+      setLoader(false);
+      setTimeout(() => {
+        loadLikedList()
+      }, 3000);
     }
   };
 
