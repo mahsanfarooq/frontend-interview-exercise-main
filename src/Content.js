@@ -38,6 +38,7 @@ export default function Content() {
 
   useEffect(() => {
     onMessage((formSubmission) => {
+      console.log("New form submission received:", formSubmission);
       showMessage(
         `${formSubmission.data.firstName} just signed up!`,
         "info",
