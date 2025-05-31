@@ -71,7 +71,9 @@ export const SnackbarProvider = ({ children }) => {
       };
       await saveLikedFormSubmission(updated);
       setLikedVersion((prev) => prev + 1);
+      handleClose(id)();
     } catch (err) {
+      handleClose(id)();
       showMessage("Failed to save Like.", "error", formSubmission, "save");
     } finally {
       setLoaderForId(id, false);
@@ -79,6 +81,7 @@ export const SnackbarProvider = ({ children }) => {
   };
 
   const handleRetry = (snackbar) => {
+    handleClose(snackbar.id)();
     if (snackbar.type === "save") {
       handleLike(snackbar.id, snackbar.formSubmission);
     } else {
@@ -127,7 +130,7 @@ export const SnackbarProvider = ({ children }) => {
                     onClick={() => handleRetry(snackbar)}
                     sx={{ fontWeight: "bold" }}
                   >
-                    Refresh
+                    Retry
                   </Button>
                 ) : (
                   <>

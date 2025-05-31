@@ -45,7 +45,7 @@ export default function Content() {
         formSubmission
       );
     });
-  }, [showMessage]);
+  }, []);
 
   return (
     <Box sx={{ mt: 4 }}>
