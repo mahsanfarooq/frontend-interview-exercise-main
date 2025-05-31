@@ -46,12 +46,12 @@ export const SnackbarProvider = ({ children }) => {
     };
     setSnackbars((prev) => [...prev, newSnackbar]);
 
-      setTimeout(() => {
-        setSnackbars((prev) =>
-          prev.map((s) => (s.id === id ? { ...s, open: false } : s))
-        );
-      }, 10000);
-
+    setTimeout(() => {
+      setSnackbars((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, open: false } : s))
+      );
+    }, 10000);
+    return id;
   };
 
   const setLoaderForId = (id, value) => {
@@ -89,7 +89,11 @@ export const SnackbarProvider = ({ children }) => {
       handleClose(id)();
     } catch (err) {
       handleClose(id)();
-      showMessage(`Failed to save Like. ${formSubmission?.data?.firstName} ${formSubmission?.data?.lastName}`, "error", formSubmission, "save");
+      let failedSnackID = showMessage(`Failed to save Like for ${formSubmission?.data?.firstName} ${formSubmission?.data?.lastName}`, "error", formSubmission, "save");
+      setTimeout(() => {
+        handleClose(failedSnackID)();
+        handleLike(id, formSubmission);
+      }, 3000);
     } finally {
       setLoaderForId(id, false);
     }
@@ -105,7 +109,7 @@ export const SnackbarProvider = ({ children }) => {
   };
 
   return (
-    <SnackbarContext.Provider value={{ showMessage, likedVersion }}>
+    <SnackbarContext.Provider value={{ showMessage, likedVersion, handleClose }}>
       {children}
 
       <div
@@ -180,24 +184,24 @@ export const SnackbarProvider = ({ children }) => {
                           Like
                         </Button>
                       )}
-                      <Button
-                        color="inherit"
-                        size="small"
-                        onClick={() =>
-                          setSnackbars((prev) =>
-                            prev.map((s) =>
-                              s.id === snackbar.id
-                                ? { ...s, open: false }
-                                : s
-                            )
-                          )
-                        }
-                        sx={{ fontWeight: "bold" }}
-                      >
-                        Dismiss
-                      </Button>
                     </>
                   )}
+                  <Button
+                    color="inherit"
+                    size="small"
+                    onClick={() =>
+                      setSnackbars((prev) =>
+                        prev.map((s) =>
+                          s.id === snackbar.id
+                            ? { ...s, open: false }
+                            : s
+                        )
+                      )
+                    }
+                    sx={{ fontWeight: "bold" }}
+                  >
+                    Dismiss
+                  </Button>
                 </>
               }
             >

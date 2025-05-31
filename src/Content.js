@@ -9,7 +9,7 @@ import { LikedSubmissionsList } from "./components/Lists/LikedSubmissionsList";
 const EnhancedLikedList = withLoadingAndError(LikedSubmissionsList);
 
 export default function Content() {
-  const { showMessage, likedLoader, likedVersion } = useSnackbar();
+  const { showMessage, likedVersion, handleClose } = useSnackbar();
 
   const [likedList, setLikedList] = useState([]);
   const [loader, setLoader] = useState(false);
@@ -24,9 +24,10 @@ export default function Content() {
       setLoader(false);
     } catch (e) {
       setLoadError("Failed to load liked submissions. Please try again.");
-      showMessage("Failed to load liked submissions.", "error");
+      const failedSnackID = showMessage("Failed to load liked submissions.", "error");
       setLoader(false);
       setTimeout(() => {
+        handleClose(failedSnackID)();
         loadLikedList()
       }, 3000);
     }
