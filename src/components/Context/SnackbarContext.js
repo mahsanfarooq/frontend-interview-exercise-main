@@ -89,11 +89,7 @@ export const SnackbarProvider = ({ children }) => {
       handleClose(id)();
     } catch (err) {
       handleClose(id)();
-      let failedSnackID = showMessage(`Failed to save Like for ${formSubmission?.data?.firstName} ${formSubmission?.data?.lastName}`, "error", formSubmission, "save");
-      setTimeout(() => {
-        handleClose(failedSnackID)();
-        handleLike(id, formSubmission);
-      }, 3000);
+      showMessage(`Failed to save Like for ${formSubmission?.data?.firstName} ${formSubmission?.data?.lastName}`, "error", formSubmission, "save");
     } finally {
       setLoaderForId(id, false);
     }
