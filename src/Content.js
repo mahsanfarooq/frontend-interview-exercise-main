@@ -15,6 +15,7 @@ export default function Content() {
   const [loader, setLoader] = useState(false);
   const [loadError, setLoadError] = useState(null);
 
+  console.log("likedList", likedList);
   const loadLikedList = async () => {
     setLoader(true);
     setLoadError(null);
