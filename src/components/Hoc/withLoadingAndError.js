@@ -11,19 +11,19 @@ const withLoadingAndError = (WrappedComponent) => {
     data,
     ...props
   }) {
-    if (error) {
-      return (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          <AlertTitle>Error</AlertTitle>
-          {error}
-          <Box mt={2}>
-            <Button variant="outlined" color="error" onClick={onRetry}>
-              Retry
-            </Button>
-          </Box>
-        </Alert>
-      );
-    }
+    // if (error) {
+    //   return (
+    //     <Alert severity="error" sx={{ mb: 3 }}>
+    //       <AlertTitle>Error</AlertTitle>
+    //       {error}
+    //       <Box mt={2}>
+    //         <Button variant="outlined" color="error" onClick={onRetry}>
+    //           Retry
+    //         </Button>
+    //       </Box>
+    //     </Alert>
+    //   );
+    // }
 
     if (isLoading) {
       return (

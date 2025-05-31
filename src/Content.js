@@ -54,7 +54,7 @@ export default function Content() {
       </Typography>
 
       <EnhancedLikedList
-        isLoading={loader || likedLoader}
+        isLoading={loader}
         error={loadError}
         onRetry={loadLikedList}
         data={likedList}
