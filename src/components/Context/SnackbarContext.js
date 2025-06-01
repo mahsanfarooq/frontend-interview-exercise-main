@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useRef, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { Alert, Button, Slide, CircularProgress } from "@mui/material";
 import { saveLikedFormSubmission } from "../../service/mockServer";
 
@@ -28,7 +28,6 @@ export const SnackbarProvider = ({ children }) => {
   const [snackbars, setSnackbars] = useState([]);
   const [likedLoaders, setLikedLoaders] = useState({});
   const [likedVersion, setLikedVersion] = useState(0);
-  const manualRetrySet = useRef(new Set());
 
   const showMessage = (
     message,
@@ -76,48 +75,34 @@ export const SnackbarProvider = ({ children }) => {
     );
   };
 
+  const handleLike = async (id, formSubmission) => {
+    if (!formSubmission) return;
 
-  const handleLike = async (id, formSubmission, isManual = false) => {
-  if (!formSubmission) return;
-
-  if (isManual) {
-    manualRetrySet.current.add(id);
-  }
-
-  setLoaderForId(id, true);
-
-  try {
-    const updated = {
-      ...formSubmission,
-      data: { ...formSubmission.data, liked: true },
-    };
-    await saveLikedFormSubmission(updated);
-    setLikedVersion((prev) => prev + 1);
-    handleClose(id)();
-    manualRetrySet.current.delete(id);
-  } catch (err) {
-    handleClose(id)();
-
-    const failedId = showMessage(
-      `Failed to save Like for ${formSubmission?.data?.firstName} ${formSubmission?.data?.lastName}`,
-      "error",
-      formSubmission,
-      "save"
-    );
-
-    setTimeout(() => {
-      if (!manualRetrySet.current.has(id)) {
+    setLoaderForId(id, true);
+    try {
+      const updated = {
+        ...formSubmission,
+        data: { ...formSubmission.data, liked: true },
+      };
+      await saveLikedFormSubmission(updated);
+      setLikedVersion((prev) => prev + 1);
+      handleClose(id)();
+    } catch (err) {
+      handleClose(id)();
+      const failedId = showMessage(`Failed to save Like for ${formSubmission?.data?.firstName} ${formSubmission?.data?.lastName}`, "error", formSubmission, "save");
+      setTimeout(() => {
+        handleClose(failedId)();
         handleLike(id, formSubmission);
-      }
-    }, 3000);
-  } finally {
-    setLoaderForId(id, false);
-  }
-};
+      }, 3000);
+    } finally {
+      setLoaderForId(id, false);
+    }
+  };
+
   const handleRetry = (snackbar) => {
     handleClose(snackbar.id)();
     if (snackbar.type === "save") {
-      handleLike(snackbar.id, snackbar.formSubmission,true);
+      handleLike(snackbar.id, snackbar.formSubmission);
     } else {
       setLikedVersion((prev) => prev + 1);
     }
@@ -186,7 +171,7 @@ export const SnackbarProvider = ({ children }) => {
                           color="inherit"
                           size="small"
                           onClick={() =>
-                            handleLike(snackbar.id, snackbar.formSubmission,true)
+                            handleLike(snackbar.id, snackbar.formSubmission)
                           }
                           disabled={likedLoaders[snackbar.id] || false}
                           sx={{ fontWeight: "bold" }}
